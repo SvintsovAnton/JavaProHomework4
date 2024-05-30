@@ -29,24 +29,20 @@ public class CarRepositoryMap implements CarRepository {
     }
 
     @Override
-    public void updateCar(Long id, BigDecimal newPrice) {
-
-        database.forEach((keyID, valueCar) -> {
-            if (keyID.toString().equals(id.toString())) {
-                valueCar.setPrice(newPrice);
-            }
-        });
+    public void updateCar(Car car) {
+        Car existingCar = database.get(car.getId());
+        if (existingCar != null) {
+            existingCar.setPrice(car.getPrice());
+        } else {
+            throw new IllegalArgumentException("car with id " + car.getId() + "not found");
+        }
     }
 
     @Override
     public void deleteCar(Long id) {
-        Iterator<Long> iterator = database.keySet().iterator();
-        while (iterator.hasNext()) {
-            if (iterator.equals(id)) {
-                iterator.remove();
-            }
-        }
+        database.remove(id);
     }
+
 
     @Override
     public Car save(Car car) {

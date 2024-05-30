@@ -2,12 +2,16 @@ package app.controller;
 
 import app.domain.Car;
 import app.repository.CarRepository;
+import app.repository.CarRepositoryDB;
 import app.repository.CarRepositoryMap;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,7 +21,7 @@ import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 public class CarServlet extends HttpServlet {
 
-    private CarRepository repository = new CarRepositoryMap();
+    private CarRepository repository = new CarRepositoryDB();
 
 //GET http://10.2.3.4:8080/cars
 //GET http://10.2.3.4:8080/cars?id=1
@@ -26,8 +30,10 @@ public class CarServlet extends HttpServlet {
     //HttpServletResponse resp объект ответа, которй будет отправлен клиенту псоле того как отрбаотает данный метод
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        //получение из БД всех автомобилей
+
+
         Map<String, String[]> parameterMap = req.getParameterMap();
+
         if (parameterMap.containsKey("id")) {
             try {
                 Car car = repository.getCar(Long.parseLong(parameterMap.get("id")[0]));
@@ -51,33 +57,36 @@ public class CarServlet extends HttpServlet {
         }
     }
 
-    //POST http://10.2.3.4:8080/cars?newBrand=Subaru&newPrice=15000&newYear=2012
+    //POST http://10.2.3.4:8080/cars?brand=Subaru&price=15000&year=2012
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Map<String, String[]> parameterMap = req.getParameterMap();
-        if (parameterMap.containsKey("newBrand") && parameterMap.containsKey("newPrice") && parameterMap.containsKey("newYear")) {
-            try {
-                Car car = new Car(parameterMap.get("newBrand")[0], new BigDecimal(parameterMap.get("newPrice")[0]), Integer.parseInt(parameterMap.get("newYear")[0]));
-                repository.save(car);
-                resp.getWriter().write("Car aded: " + car.toString());
-            } catch (NumberFormatException exception) {
-                resp.getWriter().write("Invalid format");
-            }
+        resp.setContentType("application/json");
+        ObjectMapper mapper = new ObjectMapper();
+        BufferedReader reader = req.getReader();
+        Car car;
+        try {
+            car = mapper.readValue(reader, Car.class);
+            repository.save(car);
+            resp.getWriter().write("Car added: " + car.toString());
+        } catch (Exception e) {
+            resp.getWriter().write("Error" + e.getMessage());
         }
     }
 
 
-    //PUT http://10.2.3.4:8080/cars?updateID=1&updatePrice=15000
+    //PUT http://10.2.3.4:8080/cars?id=1&rice=15000
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Map<String, String[]> parameterMap = req.getParameterMap();
-        if (parameterMap.containsKey("updateID") && parameterMap.containsKey("updatePrice")) {
-            try {
-                repository.updateCar(Long.parseLong(parameterMap.get("updateID")[0]), new BigDecimal(parameterMap.get("updatePrice")[0]));
-                resp.getWriter().write("Car updeted " + repository.getCar(Long.parseLong(parameterMap.get("updateID")[0])).toString());
-            } catch (NumberFormatException exception) {
-                resp.getWriter().write("Invalid format");
-            }
+        resp.setContentType("application/json");
+        ObjectMapper mapper = new ObjectMapper();
+        BufferedReader reader = req.getReader();
+        Car car;
+        try {
+            car = mapper.readValue(reader, Car.class);
+            repository.updateCar(car);
+            resp.getWriter().write("Car updated: " + car.toString());
+        } catch (Exception e) {
+            resp.getWriter().write("Etwas wrong, car don´t update :" + e.getMessage());
         }
     }
 
@@ -85,14 +94,17 @@ public class CarServlet extends HttpServlet {
     //DELETE http://10.2.3.4:8080/cars?deleteID=1
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Map<String, String[]> parameterMap = req.getParameterMap();
-        if (parameterMap.containsKey("deleteID")) {
-            try {
-                repository.deleteCar(Long.parseLong(parameterMap.get("deleteID")[0]));
-                resp.getWriter().write("Car with id = " + parameterMap.get("deleteID")[0] + " deleted ");
-            } catch (NumberFormatException exception) {
-                resp.getWriter().write("Invalid format");
-            }
+
+        resp.setContentType("application/json");
+        ObjectMapper objectMapper = new ObjectMapper();
+        BufferedReader reader = req.getReader();
+        try {
+            JsonNode rootNode = objectMapper.readTree(reader);
+            Long id = rootNode.get("id").asLong();
+            repository.deleteCar(id);
+            resp.getWriter().write("car with id " + id + " deleted");
+        } catch (Exception e) {
+            resp.getWriter().write("Error: " + e.getMessage());
         }
     }
 }

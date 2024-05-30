@@ -11,9 +11,11 @@ public interface CarRepository {
 
     Car getCar(Long id);
 
-    void updateCar(Long id, BigDecimal newPrice);
+    void updateCar(Car car);
+    //Car update(Car car); -
 
     void deleteCar(Long id);
+    //Car delete
 
     Car save(Car car);
 }

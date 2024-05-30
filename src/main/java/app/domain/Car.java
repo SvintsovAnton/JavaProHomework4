@@ -16,12 +16,38 @@ public class Car {
         this.year = year;
     }
 
+    public Car() {
+    }
+
+    public Car(Long id, String brand, BigDecimal price, int year) {
+        this.id = id;
+        this.brand = brand;
+        this.price = price;
+        this.year = year;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public int getYear() {
+        return year;
     }
 
     @Override
