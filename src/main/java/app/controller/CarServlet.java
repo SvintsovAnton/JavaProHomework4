@@ -3,6 +3,7 @@ package app.controller;
 import app.domain.Car;
 import app.repository.CarRepository;
 import app.repository.CarRepositoryDB;
+import app.repository.CarRepositoryHibernate;
 import app.repository.CarRepositoryMap;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -21,8 +21,8 @@ import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 public class CarServlet extends HttpServlet {
 
-    private CarRepository repository = new CarRepositoryDB();
-
+    //принип слабой связанности
+    private CarRepository repository = new CarRepositoryHibernate();
 //GET http://10.2.3.4:8080/cars
 //GET http://10.2.3.4:8080/cars?id=1
 

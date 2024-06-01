@@ -51,9 +51,11 @@ public class CarRepositoryDB implements CarRepository {
         try (Connection connection = getConnection()) {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-            resultSet.next();
+            if(resultSet.next()){
             Car car = new Car(resultSet.getLong("id"), resultSet.getString("brand"), resultSet.getBigDecimal("price"), resultSet.getInt("year"));
-            return car;
+            return car;}else {
+                return null;
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

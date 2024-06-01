@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/javacars</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">Amigo1997!!!</property>
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+
+        <mapping resource="hibernate/Car.hbm.xml"></mapping>
+    </session-factory>
+</hibernate-configuration>
